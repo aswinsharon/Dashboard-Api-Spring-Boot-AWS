@@ -1,0 +1,35 @@
+service: dashboard
+
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: java17
+  stage: dev
+  region: us-east-1
+  memorySize: 2048
+  timeout: 15
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource:
+            - arn:aws:logs:*:*:*
+package:
+  artifact: target/dashboard-java-spring-mongodb-0.0.1-SNAPSHOT.jar
+
+functions:
+  api:
+    handler: org.dashboard.dashboardjavaspringmongodb.api.handler.AwsLambdaFunctionHandler::handleRequest
+    events:
+      - httpApi:
+          path: /
+          method: ANY
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
