@@ -1,11 +1,11 @@
 package org.dashboard.dashboardjavaspringmongodb.api.utils;
 
-import org.dashboard.dashboardjavaspringmongodb.api.models.ApiResponse;
+import org.dashboard.dashboardjavaspringmongodb.api.dto.ApiResponse;
 import org.dashboard.dashboardjavaspringmongodb.api.models.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
-import org.dashboard.dashboardjavaspringmongodb.api.models.ValidationRule;
+import org.dashboard.dashboardjavaspringmongodb.api.dto.ValidationRule;
 
 public class utils {
 
