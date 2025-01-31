@@ -1,19 +1,45 @@
 package org.dashboard.dashboardjavaspringmongodb.api.services;
 
-import java.util.List;
 import org.dashboard.dashboardjavaspringmongodb.api.models.User;
+import org.dashboard.dashboardjavaspringmongodb.api.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
-public interface UserService {
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
 
-    List<User> getAllUsers();
 
-    User getUserById(String id);
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 
-    User createUser(User user);
+    public User getUserById(String id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        return optionalUser.orElse(null);
+    }
 
-    User updateUser(String id, User user);
+    public User createUser(User user) {
+        return userRepository.save(user);
+    }
 
-    void deleteUser(String id);
+    public User updateUser(String id, User user) {
+        if (userRepository.existsById(id)) {
+            return userRepository.save(user);
+        }
+        return null;
+    }
+
+    public void deleteUser(String id) {
+        userRepository.deleteById(id);
+    }
+
+    public User findByUserNameAndEmail(String username, String email){
+        Optional<User> user = userRepository.findByEmailAndUsername(email, username);
+        return user.orElse(null);
+    }
 }

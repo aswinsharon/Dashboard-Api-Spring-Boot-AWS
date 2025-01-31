@@ -39,5 +39,3 @@ build/
 .serverless/
 
 .DS_Store
-
-application.properties

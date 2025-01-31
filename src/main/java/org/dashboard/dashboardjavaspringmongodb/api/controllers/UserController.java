@@ -3,6 +3,7 @@ package org.dashboard.dashboardjavaspringmongodb.api.controllers;
 import java.util.List;
 
 //<------------- Annotations ------->
+import org.dashboard.dashboardjavaspringmongodb.api.services.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,11 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.dashboard.dashboardjavaspringmongodb.api.utils.utils;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.dashboard.dashboardjavaspringmongodb.api.models.ApiResponse;
+
+import org.dashboard.dashboardjavaspringmongodb.api.dto.ApiResponse;
 import org.dashboard.dashboardjavaspringmongodb.api.models.User;
-import org.dashboard.dashboardjavaspringmongodb.api.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.dashboard.dashboardjavaspringmongodb.api.repository.UserRepository;
@@ -30,14 +29,9 @@ import org.dashboard.dashboardjavaspringmongodb.api.repository.UserRepository;
 public class UserController {
 
     @Autowired
-    private final UserService userService;
+    private UserService userService;
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -56,9 +50,6 @@ public class UserController {
             response = utils.jsonResponse(200, "Users fetched successfully", users);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
-            // Handle the exception and return a custom error response
-            // String errorMessage = "An error occurred while fetching users: " +
-            // e.getMessage();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -77,20 +68,16 @@ public class UserController {
     public ResponseEntity<ResponseEntity<ApiResponse>> createUser(@RequestBody User user) {
         ResponseEntity<ApiResponse> response;
         try {
-            Query query = new Query();
 
-            query.addCriteria(Criteria.where("username").is(user.getUsername())
-                    .and("email").is(user.getEmail()));
-
-            boolean userExists = mongoTemplate.exists(query, User.class);
+            User fetchedUser = userService.findByUserNameAndEmail(user.getUsername(), user.getEmail());
 
             if (utils.validateNewUserObjectFields(user) && utils.validateNewUserObjectValues(user)) {
-                if (!userExists) {
+                if (fetchedUser == null) {
                     User createdUser = userService.createUser(user);
                     response = utils.jsonResponse(201, "User created successfully", createdUser);
                     return ResponseEntity.status(HttpStatus.CREATED).body(response);
                 } else {
-                    response = utils.jsonResponse(409, "Invalid Username or Email");
+                    response = utils.jsonResponse(409, "Username or email is already taken");
                     return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
                 }
             } else {

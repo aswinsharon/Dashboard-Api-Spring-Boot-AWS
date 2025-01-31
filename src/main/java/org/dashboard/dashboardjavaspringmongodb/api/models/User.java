@@ -51,7 +51,7 @@ public class User {
         }
     }
 
-    public String get_id() {
+    public String getId() {
         return _id;
     }
 
